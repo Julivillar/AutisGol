@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+.env.example
+.firebase
+.firebaserc
+.vscode
+.DS_Store
+coverage
+scripts
+firestore.rules
