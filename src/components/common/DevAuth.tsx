@@ -3,8 +3,8 @@ import { auth } from '../../services/firebase/client'
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth'
 
 export function DevAuth() {
-  const [email, setEmail] = useState('julvillce@gmail.com')
-  const [password, setPassword] = useState('Password123!')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(() => auth.currentUser)
 
   useEffect(() => {
@@ -12,13 +12,13 @@ export function DevAuth() {
     return () => unsub()
   }, [])
 
-  if (!import.meta.env.DEV) return null
+  //if (!import.meta.env.DEV) return null
 
   return (
     <div className="flex items-center gap-2 text-sm">
       {user ? (
         <>
-          <span className="text-gray-600">DEV auth: {user.email}</span>
+          <span className="text-gray-600">Usuario: {user.email}</span>
           <button className="px-2 py-1 border rounded" onClick={() => signOut(auth)}>Salir</button>
         </>
       ) : (
