@@ -6,7 +6,17 @@ import { addLiveEvent, removeLastLiveEvent, LIVE_EVENT_TYPES, type LiveEventType
 import { useCountersStore } from '../../state/counters'
 import { parseMinuteStrToSec, formatSecToMinuteStr } from '../../utils/time'
 import { usePresence } from '../../hooks/usePresence'
-import clsx from 'clsx'
+
+const COLUMNS: { key: LiveEventType, label: string }[] = [
+  { key: 'shot', label: 'Tiros' },
+  { key: 'shot_on_target', label: 'Tiros a puerta' },
+  { key: 'pass', label: 'Pases' },
+  { key: 'pass_success', label: 'Pases acertados' },
+  { key: 'key_pass', label: 'Pases clave' },
+  { key: 'interception', label: 'Intercepciones' },
+  { key: 'save', label: 'Paradas' },
+  { key: 'foul', label: 'Faltas' }
+]
 
 export function LiveCounters({ matchId }: { matchId: string }) {
   const { match, loading, error } = useMatch(matchId)
@@ -35,53 +45,72 @@ export function LiveCounters({ matchId }: { matchId: string }) {
   if (!match) return null
 
   return (
-    <div className="space-y-4">
-      <PartyBar
-        dayId={match.dayId}
-        indexInDay={match.indexInDay}
-        videoRef={match.videoRef}
-        result={match.result}
-        minuteStr={minuteStr}
-        setMinuteStr={setMinuteStr}
-        presence={presence}
-      />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {roster.map((p: any) => (
-          <PlayerCounters
-            key={p.id}
-            playerId={p.id}
-            playerName={p.name}
-            team={p.team}
-            matchId={matchId}
-            videoRef={match.videoRef}
-            counts={counts[p.id] ?? {}}
-          />
-        ))}
+    <section className="space-y-4">
+      {/* Header (party bar compacta) */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold">Registro de Eventos por Jugador</h2>
+          <p className="text-gray-500 text-sm">Actualiza el rendimiento en tiempo real</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">Minuto</label>
+            <input className="border px-2 py-1 rounded w-24 text-center" value={minuteStr} onChange={e=>setMinuteStr(e.target.value)} />
+          </div>
+          <PresenceChips list={presence} />
+        </div>
       </div>
-    </div>
+
+      {/* Tabla scrolleable sola */}
+      <div className="rounded-2xl bg-white border shadow-sm p-0 overflow-x-hidden">
+        <div className="relative overflow-x-auto">
+          <table className="w-max min-w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr className="text-gray-600">
+                <th className="text-left px-2 py-3 min-w-[20px]">Jugador</th>
+                {COLUMNS.map(col => (
+                  <th key={col.key} className="text-center px-2 py-3 whitespace-nowrap min-w-[40px]">{col.label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {roster.map((p: any) => {
+                const rowCounts = counts[p.id] ?? {}
+                return (
+                  <tr key={p.id} className="border-t">
+                    <td className="px-2 py-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={p.name} />
+                        <div className="leading-tight">
+                          <div className="font-medium">{p.name}</div>
+                          <div className="text-xs text-gray-500">{p.team === 'team1' ? 'Equipo 1' : 'Equipo 2'}</div>
+                        </div>
+                      </div>
+                    </td>
+                    {COLUMNS.map(col => (
+                      <CellCounter
+                        key={col.key}
+                        value={rowCounts[col.key] ?? 0}
+                        onInc={() => inc({ type: col.key, playerId: p.id, team: p.team, matchId: matchId, videoRef: match.videoRef, minuteStr })}
+                        onDec={() => dec({ type: col.key, playerId: p.id, matchId: matchId })}
+                      />
+                    ))}
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
   )
 }
 
-function PartyBar(props: {
-  dayId: string
-  indexInDay: number
-  videoRef: number
-  result: { t1: number, t2: number }
-  minuteStr: string
-  setMinuteStr: (s: string) => void
-  presence: any[]
-}) {
+function Avatar({ name }: { name: string }) {
+  const initials = (name || '?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()
   return (
-    <div className="rounded-2xl bg-white p-3 shadow-sm border flex items-center justify-between gap-3 flex-wrap">
-      <div className="text-sm">
-        <div className="font-medium">Día {props.dayId} · Partido {props.indexInDay} · Video {props.videoRef}</div>
-        <div className="text-gray-500">Resultado: {props.result?.t1 ?? 0} - {props.result?.t2 ?? 0}</div>
-      </div>
-      <div className="flex items-center gap-2">
-        <label className="text-sm text-gray-600">Minuto</label>
-        <input className="border px-2 py-1 rounded w-24 text-center" value={props.minuteStr} onChange={e=>props.setMinuteStr(e.target.value)} />
-      </div>
-      <PresenceChips list={props.presence} />
+    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold">
+      {initials}
     </div>
   )
 }
@@ -92,12 +121,11 @@ function PresenceChips({ list }: { list: any[] }) {
     <div className="flex items-center gap-2">
       {list.map((u: any) => (
         <div key={u.uid} className="flex items-center gap-2 px-2 py-1 border rounded-full bg-white">
-          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium">
+          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-medium">
             {avatarInitials(u.displayName || u.email || 'A')}
           </div>
           <div className="text-xs">
             <div className="font-medium">{(u.displayName || u.email || '').split('@')[0]}</div>
-            {typeof u.minuteSec === 'number' && <div className="text-gray-500">{formatSecToMinuteStr(u.minuteSec)}</div>}
           </div>
         </div>
       ))}
@@ -110,92 +138,34 @@ function avatarInitials(s: string) {
   return (p[0][0] + p[p.length-1][0]).toUpperCase()
 }
 
-function PlayerCounters(props: {
-  playerId: string
-  playerName: string
-  team: 'team1'|'team2'
-  matchId: string
-  videoRef: number
-  counts: Record<string, number>
-}) {
-  const [minuteStr, setMinuteStr] = useState('')
-  const globalMinute = useCountersStore(s => s.currentMinuteSec)
-  const pending = useCountersStore(s => s.pending)
-  const addPending = useCountersStore(s => s.addPending)
-  const clearPending = useCountersStore(s => s.clearPending)
-
-  useEffect(() => {
-    setMinuteStr(formatSecToMinuteStr(globalMinute))
-  }, [globalMinute])
-
-  function optimisticDelta(type: string) {
-    const k = `${props.playerId}:${type}` as `${string}:${string}`
-    return pending[k] ?? 0
-  }
-
-  async function inc(type: LiveEventType) {
-    const minuteSec = parseMinuteStrToSec(minuteStr || '00:00')
-    addPending(props.playerId, type, +1)
-    try {
-      await addLiveEvent({
-        matchId: props.matchId,
-        playerId: props.playerId,
-        team: props.team,
-        type,
-        minuteSec,
-        videoRef: props.videoRef
-      })
-    } finally {
-      clearPending(props.playerId, type)
-    }
-  }
-
-  async function dec(type: LiveEventType) {
-    addPending(props.playerId, type, -1)
-    try {
-      await removeLastLiveEvent({
-        matchId: props.matchId,
-        playerId: props.playerId,
-        type
-      })
-    } finally {
-      clearPending(props.playerId, type)
-    }
-  }
-
+function CellCounter({ value, onInc, onDec }: { value: number, onInc: ()=>void, onDec: ()=>void }) {
   return (
-    <div className="rounded-2xl bg-white p-3 shadow-sm border">
-      <div className="flex items-center justify-between mb-2">
-        <div className="font-medium">{props.playerName}</div>
+    <td className="px-4 py-3 text-center">
+      <div className="inline-flex items-center gap-3">
+        <button className="text-gray-500 hover:text-gray-700 px-2" onClick={onDec} aria-label="Restar">−</button>
+        <span className="font-semibold tabular-nums">{value}</span>
+        <button className="text-emerald-600 hover:text-emerald-700 px-2" onClick={onInc} aria-label="Sumar">＋</button>
       </div>
-      <div className="flex items-center gap-2 mb-2">
-        <label className="text-xs text-gray-600">Minuto</label>
-        <input className="border px-2 py-1 rounded w-24 text-center" value={minuteStr} onChange={e=>setMinuteStr(e.target.value)} />
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {LIVE_EVENT_TYPES.map((t) => {
-          const base = props.counts[t] ?? 0
-          const overlay = optimisticDelta(t)
-          const value = base + overlay
-          return (
-            <Counter key={t} label={t} value={value} onInc={() => inc(t)} onDec={() => dec(t)} pending={overlay !== 0} />
-          )
-        })}
-      </div>
-    </div>
+    </td>
   )
 }
 
-function Counter({ label, value, onInc, onDec, pending }: { label: string, value: number, onInc: ()=>void, onDec: ()=>void, pending: boolean }) {
-  return (
-    <div className={clsx("border rounded p-2", pending && "opacity-70")}>
-    
-      <div className="text-xs text-gray-600 mb-1">{label}</div>
-      <div className="flex items-center justify-between">
-        <button className="px-2 py-1 border rounded" onClick={onDec}>−</button>
-        <div className="font-semibold">{value}</div>
-        <button className="px-2 py-1 border rounded" onClick={onInc}>＋</button>
-      </div>
-    </div>
-  )
+async function inc(args: { type: LiveEventType, playerId: string, team: 'team1'|'team2', matchId: string, videoRef: number, minuteStr: string }) {
+  const minuteSec = parseMinuteStrToSec(args.minuteStr || '00:00')
+  await addLiveEvent({
+    matchId: args.matchId,
+    playerId: args.playerId,
+    team: args.team,
+    type: args.type,
+    minuteSec,
+    videoRef: args.videoRef
+  })
+}
+
+async function dec(args: { type: LiveEventType, playerId: string, matchId: string }) {
+  await removeLastLiveEvent({
+    matchId: args.matchId,
+    playerId: args.playerId,
+    type: args.type
+  })
 }

@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { ReactNode } from 'react'
+import { DevAuth } from '../../components/common/DevAuth'
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <NavItem to="/estadisticas">Estadísticas</NavItem>
             <NavItem to="/partidos">Partidos</NavItem>
           </nav>
+          <DevAuth />
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">

@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
 import { listRecentMatches } from '../../services/firebase/firestore'
+import { useNavigate } from 'react-router-dom'
 
-type Props = { onEdit: (id: string) => void, onCount?: (id: string) => void }
+type Props = {
+  onEdit?: (id: string) => void,
+  onCount?: (id: string) => void,
+  showViewButton?: boolean
+}
 
-export function MatchesList({ onEdit, onCount }: Props) {
+export function MatchesList({ onEdit, onCount, showViewButton }: Props) {
   const [items, setItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     let mounted = true
@@ -32,8 +38,13 @@ export function MatchesList({ onEdit, onCount }: Props) {
             <div className="text-gray-500">Resultado: {m.result?.t1 ?? 0} - {m.result?.t2 ?? 0} · Video {m.videoRef}</div>
           </div>
           <div className="flex items-center gap-2">
+            {showViewButton && (
+              <button className="px-2 py-1 rounded border" onClick={() => navigate(`/partidos/${m.id}`)}>
+                Ver
+              </button>
+            )}
             {onCount && <button className="px-2 py-1 rounded border" onClick={() => onCount(m.id)}>Contar</button>}
-            <button className="px-2 py-1 rounded border" onClick={() => onEdit(m.id)}>Editar</button>
+            {onEdit && <button className="px-2 py-1 rounded border" onClick={() => onEdit(m.id)}>Editar</button>}
           </div>
         </div>
       ))}

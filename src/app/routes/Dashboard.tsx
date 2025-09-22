@@ -3,7 +3,7 @@ import { MatchEditor } from '../../components/matches/MatchEditor'
 import { MatchesList } from '../../components/matches/MatchesList'
 import { LiveCounters } from '../../components/counters/LiveCounters'
 import { useDashboardStats } from '../../hooks/useDashboardStats'
-import { KPIs } from '../../components/dashboard/KPIs'
+/* import { KPIs } from '../../components/dashboard/KPIs' */
 import { MiniRankings } from '../../components/dashboard/MiniRankings'
 import { StatsTable } from '../../components/stats/StatsTable'
 
@@ -28,10 +28,10 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white p-4 shadow-sm border">
+      {/* <div className="rounded-2xl bg-white p-4 shadow-sm border">
         <h3 className="font-medium mb-3">KPIs</h3>
         <KPIs data={data.kpi} />
-      </div>
+      </div> */}
 
       <div className="rounded-2xl bg-white p-4 shadow-sm border">
         <h3 className="font-medium mb-3">Mini-rankings</h3>

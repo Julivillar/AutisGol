@@ -2,6 +2,7 @@ node_modules
 dist
 .env
 .env.example
+.env.production
 .firebase
 .firebaserc
 .vscode
@@ -9,3 +10,4 @@ dist
 coverage
 scripts
 firestore.rules
+autisgol-firebase-adminsdk-fbsvc-808c3ef7d5.json

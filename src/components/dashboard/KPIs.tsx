@@ -1,4 +1,4 @@
-export function KPIs({ data }: { data: {
+/* export function KPIs({ data }: { data: {
   goalsTotal: number
   assistsTotal: number
   passPctAvg: number
@@ -25,4 +25,4 @@ export function KPIs({ data }: { data: {
       ))}
     </div>
   )
-}
+} */

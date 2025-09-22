@@ -31,7 +31,7 @@ export function DevAuth() {
         >
           <input className="border px-2 py-1 rounded" placeholder="email" value={email} onChange={e=>setEmail(e.target.value)} />
           <input className="border px-2 py-1 rounded" placeholder="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} />
-          <button className="px-2 py-1 border rounded bg-white">Entrar (DEV)</button>
+          <button className="px-2 py-1 border rounded bg-white">Entrar</button>
         </form>
       )}
     </div>

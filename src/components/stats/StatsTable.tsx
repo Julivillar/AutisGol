@@ -6,7 +6,7 @@ import type { PlayerRow } from '../../services/statsTable'
 export function StatsTable() {
   const s = useStatsTable()
   const { players } = usePlayers()
-  const [dense, setDense] = useState(false)
+
 
   const columns: { key: keyof PlayerRow, label: string, fmt?: 'int' | 'pct' | 'ratio', numeric?: boolean }[] = [
     { key: 'name', label: 'Jugador' },
@@ -78,10 +78,6 @@ export function StatsTable() {
           value={s.search}
           onChange={e => s.setSearch(e.target.value)}
         />
-        <label className="text-sm inline-flex items-center gap-2">
-          <input type="checkbox" checked={dense} onChange={e => setDense(e.target.checked)} />
-          Vista compacta
-        </label>
 
         {/* Botones de presets */}
         <div className="flex flex-wrap items-center gap-2 ml-auto">
