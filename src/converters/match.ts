@@ -68,7 +68,7 @@ export function computeMatchName(team1Names: string[], team2Names: string[]): st
 }
 
 export function buildMatchInput(args: Omit<MatchInput, 'name'> & { team1Names: string[], team2Names: string[] }): MatchInput {
-  const name = computeMatchName(args.team1Names, args.team2Names)
+  const name = `${args.dayId} - ${computeMatchName(args.team1Names, args.team2Names)}`
   const m: MatchInput = {
     dayId: args.dayId,
     indexInDay: args.indexInDay,

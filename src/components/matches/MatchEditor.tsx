@@ -10,7 +10,7 @@ type Props = { onClose?: () => void, matchId?: string }
 export function MatchEditor({ onClose, matchId }: Props) {
   const { players, loading } = usePlayers()
 
-  const [dayId, setDayId] = useState('day-1')
+  const [dayId, setDayId] = useState('dia-')
   const [indexInDay, setIndexInDay] = useState(1)
   const [videoRef, setVideoRef] = useState(1)
   const [team1, setTeam1] = useState<string[]>([])
