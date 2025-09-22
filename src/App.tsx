@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSessionStore } from './state/session'
-import { Shell } from './app/layout/Shell'
+import { AppShell } from './app/layout/AppShell'
 
 export default function App() {
   const initialize = useSessionStore(s => s.initialize)
@@ -9,5 +9,5 @@ export default function App() {
     initialize()
   }, [initialize])
 
-  return <Shell />
+  return <AppShell children={undefined} />
 }
